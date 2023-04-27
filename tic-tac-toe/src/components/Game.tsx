@@ -17,55 +17,68 @@ const Game = () => {
   const [currentPlayer, setCurrentPlayer] = useState("X");
 
   useEffect(() => {
-   checkForWinner();
-  }, [gameState])
-  
-  const checkForWinner = () => {
-   let roundWon = false;
+    checkForWinner();
+  }, [gameState]);
 
-   for(let i=0; i<winningCombos.length; i++) {
-    const winCombo = winningCombos[i];
-    let a = gameState[winCombo[0]];
-    let b = gameState[winCombo[1]];
-    let c = gameState[winCombo[2]];
+  const reserBoard  = () => setGameState(initialGameState);
 
-    if ([a, b, c].includes("")) {
-      continue;
-    }
-
-    if(a === b && b === c ){
-      roundWon = true;
-      break;
-
-    }
-   }
-   if (roundWon) {
+  const handleWIn = () => {
     window.alert(`Congrats player ${currentPlayer}! You are the winner!`);
-    return
-   }
-   if(!gameState.includes("")){
-    window.alert("The game ended in a draw");
-    return
-   }
-   changePlayer();
+    reserBoard();
+  };
+
+  const handleDraw = () => {
+    window.alert("The game ended in a draw.");
+    reserBoard();
+  }
+
+  const checkForWinner = () => {
+    let roundWon = false;
+
+    for (let i = 0; i < winningCombos.length; i++) {
+      const winCombo = winningCombos[i];
+      let a = gameState[winCombo[0]];
+      let b = gameState[winCombo[1]];
+      let c = gameState[winCombo[2]];
+
+      if ([a, b, c].includes("")) {
+        continue;
+      }
+
+      if (a === b && b === c) {
+        roundWon = true;
+        break;
+      }
+    }
+    if (roundWon) {
+      setTimeout(() => handleWIn(), 500);
+      return;
+    }
+    if (!gameState.includes("")) {
+      setTimeout(() => handleDraw(), 500);
+      return;
+    }
+    changePlayer();
   };
 
   const changePlayer = () => {
-    setCurrentPlayer(currentPlayer === "X" ? "O" : "X" )
-  }
+    setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+  };
 
   const handleclick = (event: any) => {
-    
     const cellIndex = Number(event.target.getAttribute("data-cell-index"));
     const currentValue = gameState[cellIndex];
-    if(currentValue) {
+    if (currentValue) {
       return;
     }
 
     const newValues = [...gameState];
     newValues[cellIndex] = currentPlayer;
     setGameState(newValues);
-    console.log("file: Game.tsx ~ line 14 ~ handleClick ~ currentValue", currentValue);
+    console.log(
+      "file: Game.tsx ~ line 14 ~ handleClick ~ currentValue",
+      currentValue
+    );
   };
   return (
     <div className="h-full p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
@@ -75,7 +88,7 @@ const Game = () => {
       <div>
         <div className="grid grid-cols-3 gap-3 mx-auto w-96">
           {gameState.map((player, index) => (
-            <Square key={index} onClick={handleclick} {...{index, player}} />
+            <Square key={index} onClick={handleclick} {...{ index, player }} />
           ))}
         </div>
         <div>Scores Go Here</div>
