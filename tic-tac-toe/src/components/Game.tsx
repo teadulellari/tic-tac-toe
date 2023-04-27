@@ -23,6 +23,16 @@ const Game = () => {
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [scores, setScores] = useState(initialScores);
 
+
+  useEffect(() => {
+    //getting the scores to local storage to avoid them dissapearing after page refreshes
+    const storedScores = localStorage.getItem("scores");
+    if(storedScores) {
+      setScores(JSON.parse(storedScores));
+    }
+   
+  }, []) ;
+
   useEffect(() => {
     checkForWinner();
   }, [gameState]);
@@ -36,6 +46,7 @@ const Game = () => {
     const newScores = { ...scores };
     newScores[currentPlayer] = newPlayerScore;
     setScores(newScores);
+    localStorage.setItem("scores", JSON.stringify(newScores))
     resetBoard();
   };
 
