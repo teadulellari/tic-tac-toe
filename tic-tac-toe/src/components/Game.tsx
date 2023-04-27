@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import Square from "./Square";
 
+type Scores = {
+  [key: string]: number;
+};
+
 const initialGameState = ["", "", "", "", "", "", "", "", ""];
 const winningCombos = [
   [0, 1, 2],
@@ -12,25 +16,33 @@ const winningCombos = [
   [0, 4, 8],
   [2, 4, 6],
 ];
+const initialScores: Scores = { X: 0, O: 0 };
+
 const Game = () => {
   const [gameState, setGameState] = useState(initialGameState);
   const [currentPlayer, setCurrentPlayer] = useState("X");
+  const [scores, setScores] = useState(initialScores);
 
   useEffect(() => {
     checkForWinner();
   }, [gameState]);
 
-  const resetBoard  = () => setGameState(initialGameState);
+  const resetBoard = () => setGameState(initialGameState);
 
   const handleWIn = () => {
     window.alert(`Congrats player ${currentPlayer}! You are the winner!`);
+
+    const newPlayerScore = scores[currentPlayer] + 1;
+    const newScores = { ...scores };
+    newScores[currentPlayer] = newPlayerScore;
+    setScores(newScores);
     resetBoard();
   };
 
   const handleDraw = () => {
     window.alert("The game ended in a draw.");
     resetBoard();
-  }
+  };
 
   const checkForWinner = () => {
     let roundWon = false;
@@ -91,7 +103,17 @@ const Game = () => {
             <Square key={index} onClick={handleclick} {...{ index, player }} />
           ))}
         </div>
-        <div>Scores Go Here</div>
+        <div className="mx-auto w-96 text-2xl text-serif">
+          <p className="text-white mt-5">
+            Next Player: <span>{currentPlayer}</span>
+          </p>
+          <p className="text-white mt-5">
+            Player X wins: <span>{scores["X"]}</span>
+          </p>
+          <p className="text-white mt-5">
+            Player O wins: <span>{scores["O"]}</span>
+          </p>
+        </div>
       </div>
     </div>
   );
