@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, MouseEventHandler} from "react";
 import Square from "./Square";
 
 type Scores = {
@@ -19,6 +19,7 @@ const winningCombos = [
 const initialScores: Scores = { X: 0, O: 0 };
 
 const Game = () => {
+   const hoverStyle = "transition duration-500 hover:scale-105 transform";
   const [gameState, setGameState] = useState(initialGameState);
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [scores, setScores] = useState(initialScores);
@@ -34,6 +35,9 @@ const Game = () => {
   }, []) ;
 
   useEffect(() => {
+    if(gameState === initialGameState) {
+      return;
+    }
     checkForWinner();
   }, [gameState]);
 
@@ -88,7 +92,7 @@ const Game = () => {
     setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
   };
 
-  const handleclick = (event: any) => {
+  const handleClick = (event: any) => {
     const cellIndex = Number(event.target.getAttribute("data-cell-index"));
     const currentValue = gameState[cellIndex];
     if (currentValue) {
@@ -98,35 +102,43 @@ const Game = () => {
     const newValues = [...gameState];
     newValues[cellIndex] = currentPlayer;
     setGameState(newValues);
-    console.log(
-      "file: Game.tsx ~ line 14 ~ handleClick ~ currentValue",
-      currentValue
-    );
+
   };
+
+  const handleRestart: MouseEventHandler<HTMLButtonElement> = () => {
+    setGameState(initialGameState);
+    setScores(initialScores);
+  };
+
   return (
-    <div className="h-full p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
-      <h1 className="text-center text-5xl mb-4 font-display text-white">
-        Tic Tac Toe Game
-      </h1>
-      <div>
-        <div className="grid grid-cols-3 gap-3 mx-auto w-96">
-          {gameState.map((player, index) => (
-            <Square key={index} onClick={handleclick} {...{ index, player }} />
-          ))}
-        </div>
-        <div className="mx-auto w-96 text-2xl text-serif">
-          <p className="text-white mt-5">
-            Next Player: <span>{currentPlayer}</span>
-          </p>
-          <p className="text-white mt-5">
-            Player X wins: <span>{scores["X"]}</span>
-          </p>
-          <p className="text-white mt-5">
-            Player O wins: <span>{scores["O"]}</span>
-          </p>
-        </div>
-      </div>
+<div className="h-full p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
+  <h1 className="text-center text-5xl mb-4 font-display text-white">
+    Tic Tac Toe Game
+  </h1>
+  <div>
+    <div className="grid grid-cols-3 gap-3 mx-auto w-96">
+      {gameState.map((player, index) => (
+        <Square key={index} onClick={handleClick} {...{ index, player }} />
+      ))}
     </div>
+    <div className="flex items-center justify-center mx-auto w-96">
+      <div className="text-2xl text-serif text-white mr-8">
+        <p>
+          Next Player: <span>{currentPlayer}</span>
+        </p>
+        <p className="mt-5">
+          Player X wins: <span>{scores["X"]}</span>
+        </p>
+        <p className="mt-5">
+          Player O wins: <span>{scores["O"]}</span>
+        </p>
+      </div>
+      <button className={`bg-white hover:bg-gray-100 text-teal-500 font-semibold  py-3 px-6 text-serif rounded shadow ${hoverStyle}`} onClick={handleRestart}>
+        Restart
+      </button>
+    </div>
+  </div>
+</div>
   );
 };
 
