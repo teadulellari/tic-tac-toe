@@ -123,7 +123,7 @@ const Game = () => {
     </div>
     <div className="flex items-center justify-center mx-auto w-96">
       <div className="text-2xl text-serif text-white mr-8">
-        <p>
+        <p className="mt-5">
           Next Player: <span>{currentPlayer}</span>
         </p>
         <p className="mt-5">
