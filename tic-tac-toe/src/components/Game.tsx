@@ -23,7 +23,7 @@ const Game = () => {
   const [gameState, setGameState] = useState(initialGameState);
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [scores, setScores] = useState(initialScores);
-//notes check the minimax. check why it doesnt stop when is won and check also why it doesnt stop the ganme
+
   useEffect(() => {
     //getting the scores to local storage to avoid them dissapearing after page refreshes
     const storedScores = localStorage.getItem("scores");
@@ -37,45 +37,32 @@ const Game = () => {
       return;
     }
     checkIfOver();
-    console.log("CHANGING PLAYER")
-    changePlayer()
-
+    changePlayer();
+    if (checkForWinner(gameState)) {
+      setCurrentPlayer("X");
+    }
   }, [gameState]);
 
   useEffect(() => {
     if (currentPlayer === "O") {
-     let result= checkForWinner(gameState)
-     if(result !== "tie"){
-      let aiCoordinates = bestMove();
-      console.log("AI move coord = "+ aiCoordinates)
-      const newValues = [...gameState];
-      newValues[aiCoordinates] = currentPlayer;
-      console.log(" TURN IS = "+ currentPlayer)
-      if(currentPlayer==="O" && aiCoordinates != null){
-        setGameState(newValues);
+      let result = checkForWinner(gameState);
+      if (result !== "tie") {
+        let aiCoordinates = bestMove();
+        const newValues = [...gameState];
+        newValues[aiCoordinates] = currentPlayer;
+        if (currentPlayer === "O" && aiCoordinates != null) {
+          setGameState(newValues);
+        }
       }
-     }
     }
-      
-    //  }else{
-    //   let huCordinates=bestMove();
-    //   const newValues = [...gameState];
-    //   newValues[huCordinates] = currentPlayer;
-    //   setGameState(newValues);
-      // }
-  }, [currentPlayer]); //currentPLAYER
+  }, [currentPlayer]); 
 
   const resetBoard = () => setGameState(initialGameState);
 
   const handleWin = () => {
     window.alert(`Congrats player ${currentPlayer}! You are the winner!`);
-    // changePlayer();
-    // const newPlayerScore = scores[currentPlayer] + 1;
-    // const newScores = { ...scores };
-    // newScores[currentPlayer] = newPlayerScore;
-    // setScores(newScores);
-    const newScores = {...scores, [currentPlayer]: scores[currentPlayer]+1 }
-    setScores(newScores)
+    const newScores = { ...scores, [currentPlayer]: scores[currentPlayer] + 1 };
+    setScores(newScores);
     localStorage.setItem("scores", JSON.stringify(newScores));
     resetBoard();
   };
@@ -86,155 +73,95 @@ const Game = () => {
   };
 
   const checkIfOver = () => {
-    let roundWon = false;
+    const winner = checkForWinner(gameState);
 
-    for (let i = 0; i < winningCombos.length; i++) {
-      const winCombo = winningCombos[i];
-      let a = gameState[winCombo[0]];
-      let b = gameState[winCombo[1]];
-      let c = gameState[winCombo[2]];
-
-      if ([a, b, c].includes("")) {
-        continue;
-      }
-
-      if (a === b && b === c) {
-        setTimeout(() => handleWin(), 500);
-        return;
-      }
-    }
-   
-    if (!gameState.includes("")) {
+    if (winner === "tie") {
       setTimeout(() => handleDraw(), 500);
-      return;
+    } else if (winner) {
+      setTimeout(() => handleWin(), 500);
     }
-    // changePlayer();
-    //if player is ai (O) call the ai function
   };
-  const equals3 = (a: string, b: string, c: string): boolean => a === b && b === c && a !== '';
 
-const checkForWinner =(gameState: string[]) => {
-  let winner: string | null = null;
+  const equals3 = (a: string, b: string, c: string): boolean =>
+    a === b && b === c && a !== "";
 
-  // Horizontal
-  for (let i = 0; i < 3; i++) {
-    if (equals3(gameState[i * 3], gameState[i * 3 + 1], gameState[i * 3 + 2])) {
-      winner = gameState[i * 3];
+  const checkForWinner = (gameState: string[]): string | null => {
+    let winner: string | null = null;
+
+    // Horizontal
+    for (let i = 0; i < 3; i++) {
+      if (
+        equals3(gameState[i * 3], gameState[i * 3 + 1], gameState[i * 3 + 2])
+      ) {
+        winner = gameState[i * 3];
+      }
     }
-  }
 
-  // Vertical
-  for (let i = 0; i < 3; i++) {
-    if (equals3(gameState[i], gameState[i + 3], gameState[i + 6])) {
-      winner = gameState[i];
+    // Vertical
+    for (let i = 0; i < 3; i++) {
+      if (equals3(gameState[i], gameState[i + 3], gameState[i + 6])) {
+        winner = gameState[i];
+      }
     }
-  }
 
-  // Diagonal
-  if (equals3(gameState[0], gameState[4], gameState[8])) {
-    winner = gameState[0];
-  }
-  if (equals3(gameState[2], gameState[4], gameState[6])) {
-    winner = gameState[2];
-  }
-
-  let openSpots = 0;
-  for (let i = 0; i < 9; i++) {
-    if (gameState[i] === '') {
-      openSpots++;
+    // Diagonal
+    if (equals3(gameState[0], gameState[4], gameState[8])) {
+      winner = gameState[0];
     }
-  }
+    if (equals3(gameState[2], gameState[4], gameState[6])) {
+      winner = gameState[2];
+    }
 
-  return winner === null && openSpots === 0 ? 'tie' : winner;
-};
+    let openSpots = 0;
+    for (let i = 0; i < 9; i++) {
+      if (gameState[i] === "") {
+        openSpots++;
+      }
+    }
 
-  // const evaluatingScores = (gameState: Array<string>) => {// HERE IS THE PROBLEMMMM
-  //   for (let i = 0; i < winningCombos.length; i++) {
-  //     const [a, b, c] = winningCombos[i];
-  //     if (gameState[a] === gameState[b] && gameState[b] === gameState[c] && gameState[a] !== "") {
-  //       return gameState[a] === "X" ? -10 : 10;
-  //     }
-  //   }
-  
-  //   if (!gameState.includes("")) {
-  //     // It's a draw
-  //     return 0;
-  //   }
-  
-  // };
-  // const isMoveLeft = () => {
-  //   for (let i = 0; i < gameState.length; i++) {
-  //     if (gameState[i] == "") return true;
-  //   }
+    return winner === null && openSpots === 0 ? "tie" : winner;
+  };
 
-  //   return false;
-  //  };
   const changePlayer = () => {
     setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-    console.log(currentPlayer);
   };
 
   const bestMove = () => {
     let bestScore = -Infinity;
     let coordinates: any;
-  
+
     for (let i = 0; i < 9; i++) {
-      // if(isMoveLeft()=== false){
-      //   break;
-      //  }
-        if (gameState[i] === "") {
-          let newGameState = [...gameState];
-          newGameState[i] = currentPlayer;
-          //
-          let score = 0;
-          // if (currentPlayer === "O") {
-            score = minimax(newGameState, 0, false);
-            console.log("OUR SCORE = "+ score)
-          // } else {
-          //   score = minimax(newGameState, 0, true);
-          // }
-          // gameState[i] = currentPlayer;//"O"
-          // let score = minimax(newGameState, 0, false);
-          newGameState[i] = "";
-          // bestScore = Math.max(score, bestScore);
-          if (score > bestScore) {
-            console.log(score);
-            bestScore = score;
-            console.log(bestScore);
-            coordinates = i;
-            console.log(coordinates);
-          }
+      if (gameState[i] === "") {
+        let newGameState = [...gameState];
+        newGameState[i] = currentPlayer;
+        let score = 0;
+        score = minimax(newGameState, 0, false);
+        newGameState[i] = "";
+        if (score > bestScore) {
+          bestScore = score;
+          coordinates = i;
         }
-      
-   
+      }
     }
 
     return coordinates;
   };
   let scoresample: any = {
-    X:-10,
+    X: -10,
     O: 10,
     tie: 0,
-  }
+  };
 
-  // ai move
-  const minimax = (gameState: Array<string>, depth: number, isMaximizer: boolean): number => {
-   debugger
-    // if (!isMoveLeft()) {
-    //   return 0;
-    // }
-  //   const score = evaluatingScores(gameState);
-  //   if (score === 10) {
-  //     return 10;
-  //   }
-  //  if(score === -10){
-  //   return -10;
-  //  }
-  let result = checkForWinner(gameState);
-  if(result!=null){
-    let score = scoresample[result];
-    return score;
-  }
+  const minimax = (
+    gameState: Array<string>,
+    depth: number,
+    isMaximizer: boolean
+  ): number => {
+    let result = checkForWinner(gameState);
+    if (result != null) {
+      let score = scoresample[result];
+      return score;
+    }
     if (isMaximizer) {
       let bestScore = -Infinity;
       for (let i = 0; i < 9; i++) {
@@ -244,18 +171,11 @@ const checkForWinner =(gameState: string[]) => {
           let score = minimax(newGameState, depth + 1, false);
           newGameState[i] = "";
           bestScore = Math.max(score, bestScore);
-        
         }
-      //   const score = evaluatingScores();
-      //   if (score === 10) {
-      //     return 10;
-      //   }
-      //  if(score === -10){
-      //   return -10;
-      //  }
       }
       return bestScore;
-    } else { // MINIMIZER
+    } else {
+      // MINIMIZER
       let bestScore = Infinity;
       for (let i = 0; i < 9; i++) {
         if (gameState[i] === "") {
@@ -265,59 +185,22 @@ const checkForWinner =(gameState: string[]) => {
           newGameState[i] = "";
           bestScore = Math.min(score, bestScore);
         }
-      //   const score = evaluatingScores();
-      //   if (score === 10) {
-      //     return 10;
-      //   }
-      //  if(score === -10){
-      //   return -10;
-      //  }
       }
       return bestScore;
     }
   };
-  
-  
+
   const handleClick = (event: any) => {
     const cellIndex = Number(event.target.getAttribute("data-cell-index"));
     const currentValue = gameState[cellIndex];
     if (currentValue) {
       return;
     }
-  
+
     const newValues = [...gameState];
     newValues[cellIndex] = currentPlayer;
     setGameState(newValues);
-   
-  
-    // setCurrentPlayer("X"); // No need to set currentPlayer here
   };
-
-  // const isMaximizer = () => {
-  //   if(currentPlayer === "O"){
-  //     return true;
-  //   }else{
-  //     return false;
-  //   }
-  // }
-  //here is the minimax
-  //the maximizer is ai and minimizer is human
-  //depth is the empty places in the board
-  // let determiningScore : {
-  //   "X" : 1;
-  //   "O" : -1;
-  //   "tie" : 0;
-  // }
-  // const findDepth = (gameState: Array<string>): number => {
-  //   //checkForWinner();
-  //   let depth = 0;
-  //   for (let i = 0; i < gameState.length; i++) {
-  //     if (gameState[i] == "") {
-  //       depth++;
-  //     }
-  //   }
-  //   return depth;
-  // };
 
   const handleRestart: MouseEventHandler<HTMLButtonElement> = () => {
     setGameState(initialGameState);
