@@ -55,7 +55,7 @@ const Game = () => {
         }
       }
     }
-  }, [currentPlayer]); 
+  }, [currentPlayer]);
 
   const resetBoard = () => setGameState(initialGameState);
 
@@ -208,25 +208,25 @@ const Game = () => {
   };
 
   return (
-    <div className="h-full p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
-      <h1 className="text-center text-5xl mb-4 font-display text-white">
+    <div className="flex flex-col min-h-screen justify-center items-center p-8 text-slate-800 bg-gradient-to-r from-cyan-500 to-blue-500">
+      <h1 className="text-center text-5xl mt-8 mb-4 font-display text-white sm:mt-0">
         Tic Tac Toe Game
       </h1>
-      <div>
+      <div className="flex flex-col justify-center items-center py-8">
         <div className="grid grid-cols-3 gap-3 mx-auto w-96">
           {gameState.map((player, index) => (
             <Square key={index} onClick={handleClick} {...{ index, player }} />
           ))}
         </div>
-        <div className="flex items-center justify-center mx-auto w-96">
+        <div className="flex items-center justify-center mx-auto w-96 mt-8 sm:mt-12">
           <div className="text-2xl text-serif text-white font-bold mr-8">
-            <p className="mt-5">
+            <p className="mt-2">
               Next Player: <span>{currentPlayer}</span>
             </p>
-            <p className="mt-5">
+            <p className="mt-2">
               Player X wins: <span>{scores["X"]}</span>
             </p>
-            <p className="mt-5">
+            <p className="mt-2 mb-4">
               Player O wins: <span>{scores["O"]}</span>
             </p>
           </div>
@@ -241,5 +241,4 @@ const Game = () => {
     </div>
   );
 };
-
 export default Game;

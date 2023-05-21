@@ -13,13 +13,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
+  overflow: hidden;
+  height: 100vh; /* Set the body height to 100% of the viewport height */
 }
 
 #root {
   height: 100%;
+  overflow-y: auto; /* Enable vertical scrolling for #root element */
 }
-
-
-
-
